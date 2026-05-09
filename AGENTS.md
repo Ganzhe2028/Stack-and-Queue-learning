@@ -30,15 +30,19 @@ cd visualization && javac ArrayStack.java ArrayQueue.java Main.java && java Main
 javac answer/*.java
 java answer.Main
 
-# 可视化（浏览器，无服务端依赖）
+# 默认可视化（浏览器，无服务端依赖）
 open visualization/index.html
+
+# 2.0 预览版可视化（高度自适应教学工作台）
+open visualization/index-2.0.html
 ```
 
 ## 代码注意事项
 
 - **根目录 stub 不可编译。** 学生的填空版本尚未完成，缺少方法体。不要尝试编译或运行根目录文件——它们只是骨架。
 - **answer/ 文件在 `package answer;` 下。** 任何 agent 在引用/拷贝 answer 代码时注意保留或调整 package 声明。visualization/ 下的副本是默认包（无 package 声明）。
-- **visualization/index.html** 是完全自包含的静态页面（内联 CSS + JS，无外部依赖），直接在浏览器打开即可。它内置了 ArrayStack 和 ArrayQueue 的 Java 源码副本作为代码显示。
+- **visualization/index.html** 是完全自包含的静态页面（内联 CSS + JS，无外部依赖），直接在浏览器打开即可。它内置了 ArrayStack 和 ArrayQueue 的 Java 源码副本作为代码显示；Stack/Queue 演示支持 Auto 1.5s 自动播放和 Step 手动逐步控制，当前布局不包含变量快照侧栏。
+- **visualization/index-2.0.html** 是 2.0 预览版，不替代原页面。它保留同一套 Stack/Queue 演示能力，采用高度自适应浏览器窗口的“教学工作台”布局；待执行状态先高亮方法入口行，并重构了播放 runtime 以减少 Stack/Queue 重复逻辑。
 
 ## Git 历史
 
@@ -50,5 +54,5 @@ open visualization/index.html
 
 - **如果用户在使用根目录文件：** 它们是 skeleton/template，不要假设它们可运行。不要修改它们，除非用户明确要求"完成填空"。
 - **如果用户提到"答案"或"参考实现"：** 去 answer/ 看。
-- **如果用户提到"可视化"或"演示"：** 去 visualization/index.html，直接在浏览器打开即可。
+- **如果用户提到"可视化"或"演示"：** 默认去 visualization/index.html，直接在浏览器打开即可；如果用户提到"2.0"、"预览版"、"新版 UI"或"教学工作台"，去 visualization/index-2.0.html。
 - **本项目无测试、无 linter、无 CI。** 验证正确性的方法是编译 + 运行 answer 或 visualization 中的实现。

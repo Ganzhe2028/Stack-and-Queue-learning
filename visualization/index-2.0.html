@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stack &amp; Queue Visualizer</title>
+<title>Stack &amp; Queue Lab 2.0</title>
 <style>
   /* ===== RESET & BASE ===== */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -130,7 +130,7 @@
     border: 1px solid var(--line);
     padding: 28px;
     position: relative;
-    overflow: hidden;
+    overflow: auto;
   }
   .viz-panel::before {
     content: '';
@@ -557,6 +557,439 @@
     box-shadow: 0 8px 32px rgba(0,0,0,0.2);
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(-8px); }
+
+  /* ===== 2.0 TEACHING WORKBENCH OVERRIDE ===== */
+  :root {
+    --paper: #f4f6f1;
+    --panel: #fbfcf8;
+    --ink: #172033;
+    --muted: #667085;
+    --line: #d4dccb;
+    --cobalt: #2257a7;
+    --cobalt-soft: #e3edff;
+    --mint: #23846f;
+    --mint-soft: #def1ea;
+    --orange: #e7832d;
+    --orange-soft: #ffe2c5;
+    --rose: #bd4f4a;
+    --rose-soft: #f5d9d6;
+    --shadow: rgba(39, 56, 36, 0.11);
+    --radius: 10px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    background: #edf1e9;
+    background-image:
+      linear-gradient(rgba(34, 87, 167, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(35, 132, 111, 0.04) 1px, transparent 1px);
+    background-size: 28px 28px;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .app {
+    background: transparent;
+    box-shadow: none;
+    height: 100vh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .header {
+    flex: 0 0 auto;
+    padding: clamp(14px, 2vh, 22px) 40px clamp(10px, 1.6vh, 18px);
+    align-items: center;
+    background: rgba(244, 246, 241, 0.94);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .header-left h1 {
+    font-size: 30px;
+    letter-spacing: 0;
+  }
+
+  .header-left p {
+    margin-top: 4px;
+    color: #526071;
+  }
+
+  .header-badge {
+    border-radius: 8px;
+    background: var(--ink);
+    color: #f7faf5;
+    letter-spacing: 0;
+  }
+
+  .tabs {
+    flex: 0 0 auto;
+    padding: clamp(6px, 1.2vh, 10px) 40px 0;
+    gap: 8px;
+    background: rgba(244, 246, 241, 0.92);
+  }
+
+  .tab {
+    border: 1px solid transparent;
+    border-radius: 8px 8px 0 0;
+    letter-spacing: 0;
+  }
+
+  .tab.active {
+    border-color: var(--line);
+    border-bottom-color: var(--panel);
+    box-shadow: none;
+  }
+
+  .tab.active::after {
+    left: 14px;
+    right: 14px;
+    background: var(--cobalt);
+  }
+
+  .content {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: clamp(14px, 2vh, 22px) 40px clamp(16px, 2.4vh, 30px);
+    overflow: hidden;
+  }
+
+  .content.active {
+    display: grid;
+    grid-template-columns: minmax(520px, 1.12fr) minmax(440px, 0.88fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 18px;
+  }
+
+  .viz-panel,
+  .code-panel {
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    box-shadow: 0 18px 44px var(--shadow);
+  }
+
+  .viz-panel {
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(16px, 2.1vh, 24px) 28px;
+    overflow: auto;
+  }
+
+  .viz-panel::before {
+    display: none;
+  }
+
+  .viz-title {
+    margin-bottom: 14px;
+    letter-spacing: 0;
+  }
+
+  .array-container {
+    flex: 1 0 220px;
+    min-height: 220px;
+    align-items: center;
+    padding: clamp(8px, 1.6vh, 18px) 0 clamp(10px, 2vh, 24px);
+    overflow: visible;
+  }
+
+  .array-container.vertical {
+    flex-basis: 270px;
+    justify-content: center;
+    min-height: 270px;
+    padding: clamp(16px, 2.2vh, 24px) 20px clamp(4px, 0.8vh, 10px);
+  }
+
+  .array-container.vertical .cell {
+    width: 108px;
+    height: clamp(30px, 4.9vh, 44px);
+  }
+
+  .cell {
+    width: 78px;
+    height: 88px;
+    border-radius: 8px;
+    box-shadow: none;
+  }
+
+  .cell .value {
+    font-family: "Avenir Next", "PingFang SC", "Noto Sans SC", -apple-system, sans-serif;
+    font-size: 30px;
+  }
+
+  .capacity-label {
+    margin-top: 16px;
+    color: #526071;
+  }
+
+  .info-banner {
+    border-radius: 8px;
+    background: #f6f8f1;
+    min-height: 48px;
+  }
+
+  .info-banner .step-tag {
+    border-radius: 8px;
+    letter-spacing: 0;
+  }
+
+  .controls {
+    margin-top: clamp(10px, 1.5vh, 18px);
+    gap: 8px 12px;
+  }
+
+  .btn {
+    border-radius: 8px;
+    min-height: 42px;
+    padding: 9px 18px;
+    letter-spacing: 0;
+  }
+
+  .value-input {
+    height: 42px;
+    border-radius: 8px;
+  }
+
+  .progress-bar {
+    margin-top: clamp(10px, 1.5vh, 18px);
+  }
+
+  .progress-step {
+    height: 12px;
+    border-radius: 4px;
+  }
+
+  .progress-label {
+    min-width: 44px;
+    text-align: right;
+  }
+
+  .code-panel {
+    min-width: 0;
+    height: 100%;
+    max-height: none;
+    position: static;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .code-header {
+    padding: 16px 20px;
+    background: #f7f9f3;
+  }
+
+  .code-header .line-indicator {
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .code-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    padding: 16px 18px;
+    overflow: auto;
+  }
+
+  .code-line {
+    border-radius: 6px;
+  }
+
+  .code-line.highlight {
+    border-left: 4px solid var(--cobalt);
+    background: #dce9ff;
+  }
+
+  @media (max-width: 1100px) {
+    body,
+    .app {
+      height: auto;
+      min-height: 100vh;
+      overflow: auto;
+    }
+
+    .content {
+      overflow: visible;
+    }
+
+    .content.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .viz-panel {
+      height: auto;
+      min-height: auto;
+      overflow: visible;
+    }
+
+    .code-panel {
+      height: auto;
+      position: static;
+      max-height: none;
+    }
+
+    .code-body {
+      max-height: none;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .header {
+      padding: 20px;
+    }
+
+    .tabs {
+      padding: 8px 20px 0;
+    }
+
+    .content {
+      padding: 18px 20px 28px;
+    }
+
+    .array-container.vertical .cell {
+      width: 86px;
+      height: 44px;
+    }
+
+    .cell {
+      width: 52px;
+      height: 64px;
+    }
+  }
+
+  .array-container.vertical {
+    padding: 8px 20px 12px;
+  }
+
+  .array-container.vertical .cells-row {
+    gap: 4px !important;
+  }
+
+  .array-container.vertical .cell {
+    width: 90px;
+    height: clamp(24px, 3.8vh, 32px);
+  }
+
+  .array-container.vertical .cell .value {
+    font-size: 22px;
+  }
+
+  @media (max-height: 700px) and (min-width: 1101px) {
+    .header {
+      padding: 10px 40px 8px;
+    }
+
+    .header-left h1 {
+      font-size: 26px;
+    }
+
+    .header-left p {
+      margin-top: 2px;
+      font-size: 14px;
+    }
+
+    .header-badge {
+      min-width: 110px;
+      padding: 10px 16px;
+    }
+
+    .tabs {
+      padding-top: 4px;
+    }
+
+    .tab {
+      padding: 10px 24px;
+    }
+
+    .content {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      gap: 14px;
+    }
+
+    .viz-panel {
+      padding: 14px 24px;
+    }
+
+    .viz-title {
+      margin-bottom: 8px;
+    }
+
+    .array-container.vertical {
+      flex: 1 0 184px;
+      min-height: 184px;
+      padding: 4px 20px 6px;
+    }
+
+    .array-container.vertical .cells-row {
+      gap: 3px !important;
+    }
+
+    .array-container.vertical .cell {
+      width: 76px;
+      height: 20px;
+    }
+
+    .array-container.vertical .cell .value {
+      font-size: 18px;
+    }
+
+    .array-container.vertical .cell .index {
+      right: -26px;
+    }
+
+    .pointer-badge {
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+
+    .capacity-label {
+      margin-top: 6px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .info-banner {
+      min-height: 40px;
+      padding: 8px 18px;
+    }
+
+    .controls {
+      margin-top: 8px;
+      gap: 8px;
+    }
+
+    .btn {
+      min-height: 36px;
+      padding: 7px 14px;
+      font-size: 13px;
+    }
+
+    .value-input {
+      width: 52px;
+      height: 36px;
+      font-size: 17px;
+    }
+
+    .progress-bar {
+      margin-top: 8px;
+    }
+
+    .code-header {
+      padding: 12px 20px;
+    }
+
+    .code-body {
+      padding: 12px 18px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -565,10 +998,10 @@
   <!-- HEADER -->
   <header class="header">
     <div class="header-left">
-      <h1>Stack &amp; Queue · 算法可视化</h1>
-      <p>逐行高亮 Java 源代码，直观展示数组实现的栈与队列内部运作</p>
+      <h1>Stack &amp; Queue Lab 2.0</h1>
+      <p>课堂演示工作台：步骤、数组状态、源码高亮同步展示</p>
     </div>
-    <div class="header-badge">CS 教学演示</div>
+    <div class="header-badge">2.0 Preview</div>
   </header>
 
   <!-- TABS -->
@@ -1223,7 +1656,7 @@ function renderCode(containerId, codeLines, highlightLines) {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/  /g, '  ');
-    return `<div class="code-line ${hl}"><span class="num">${String(num).padStart(2, '0')}</span><span class="code">${escaped}</span></div>`;
+    return `<div class="code-line ${hl}" data-line="${num}"><span class="num">${String(num).padStart(2, '0')}</span><span class="code">${escaped}</span></div>`;
   }).join('');
 
   if (highlightLines.length > 0) {
@@ -1380,47 +1813,110 @@ function updateModeButtons(prefix, mode) {
   manualBtn.classList.toggle('active', mode === 'manual');
 }
 
-function clearStackAutoTimer() {
-  if (stackAutoTimer) {
-    clearTimeout(stackAutoTimer);
-    stackAutoTimer = null;
+const demoRuntime = {
+  stack: {
+    engine: stackEngine,
+    prefix: 'stack',
+    tagId: 'stack-step-tag',
+    msgId: 'stack-msg',
+    get mode() { return stackPlaybackMode; },
+    setMode(value) { stackPlaybackMode = value; },
+    get animating() { return stackAnimating; },
+    setAnimating(value) { stackAnimating = value; },
+    get timer() { return stackAutoTimer; },
+    setTimer(value) { stackAutoTimer = value; },
+    refresh(step) { refreshStackDisplay(step); },
+  },
+  queue: {
+    engine: queueEngine,
+    prefix: 'queue',
+    tagId: 'queue-step-tag',
+    msgId: 'queue-msg',
+    get mode() { return queuePlaybackMode; },
+    setMode(value) { queuePlaybackMode = value; },
+    get animating() { return queueAnimating; },
+    setAnimating(value) { queueAnimating = value; },
+    get timer() { return queueAutoTimer; },
+    setTimer(value) { queueAutoTimer = value; },
+    refresh(step) { refreshQueueDisplay(step); },
+  },
+};
+
+function clearAutoTimer(kind) {
+  const runtime = demoRuntime[kind];
+  if (runtime.timer) {
+    clearTimeout(runtime.timer);
+    runtime.setTimer(null);
   }
-  stackAnimating = false;
+  runtime.setAnimating(false);
 }
 
-function clearQueueAutoTimer() {
-  if (queueAutoTimer) {
-    clearTimeout(queueAutoTimer);
-    queueAutoTimer = null;
-  }
-  queueAnimating = false;
+function setPlaybackMode(kind, mode) {
+  const runtime = demoRuntime[kind];
+  if (runtime.animating || hasOperationInProgress(runtime.engine)) return;
+  runtime.setMode(mode);
+  updateModeButtons(runtime.prefix, mode);
+  runtime.refresh(runtime.engine.currentStep());
 }
 
-function setStackPlaybackMode(mode) {
-  if (stackAnimating || hasOperationInProgress(stackEngine)) return;
-  stackPlaybackMode = mode;
-  updateModeButtons('stack', mode);
-  refreshStackDisplay(stackEngine.currentStep());
-}
-
-function setQueuePlaybackMode(mode) {
-  if (queueAnimating || hasOperationInProgress(queueEngine)) return;
-  queuePlaybackMode = mode;
-  updateModeButtons('queue', mode);
-  refreshQueueDisplay(queueEngine.currentStep());
-}
-
-function markStackCompleteIfNeeded() {
-  if (stackEngine.totalSteps() > 0 && stackEngine.currentIndex() >= 0 && !stackEngine.hasNext()) {
-    document.getElementById('stack-step-tag').textContent = '完成';
+function markCompleteIfNeeded(kind) {
+  const runtime = demoRuntime[kind];
+  if (runtime.engine.totalSteps() > 0 && runtime.engine.currentIndex() >= 0 && !runtime.engine.hasNext()) {
+    document.getElementById(runtime.tagId).textContent = '完成';
   }
 }
 
-function markQueueCompleteIfNeeded() {
-  if (queueEngine.totalSteps() > 0 && queueEngine.currentIndex() >= 0 && !queueEngine.hasNext()) {
-    document.getElementById('queue-step-tag').textContent = '完成';
+function startOperation(kind, steps, readyMessage, previewLines = []) {
+  const runtime = demoRuntime[kind];
+  if (runtime.animating || hasOperationInProgress(runtime.engine)) return;
+  clearAutoTimer(kind);
+  runtime.engine.load(steps);
+
+  if (runtime.mode === 'manual') {
+    runtime.refresh({
+      tag: '待执行',
+      desc: readyMessage,
+      lines: previewLines,
+      action: () => {},
+      revert: () => {},
+    });
+    return;
   }
+
+  runtime.setAnimating(true);
+  runtime.refresh(null);
+  runAuto(kind);
 }
+
+function runAuto(kind) {
+  const runtime = demoRuntime[kind];
+  const step = runtime.engine.next();
+  if (!step) {
+    runtime.setAnimating(false);
+    runtime.refresh(runtime.engine.currentStep());
+    markCompleteIfNeeded(kind);
+    return;
+  }
+
+  if (runtime.engine.hasNext()) {
+    runtime.setTimer(setTimeout(() => runAuto(kind), AUTO_STEP_DELAY_MS));
+    return;
+  }
+
+  runtime.setTimer(setTimeout(() => {
+    runtime.setAnimating(false);
+    runtime.setTimer(null);
+    runtime.refresh(runtime.engine.currentStep());
+    markCompleteIfNeeded(kind);
+  }, AUTO_STEP_DELAY_MS));
+}
+
+function clearStackAutoTimer() { clearAutoTimer('stack'); }
+function clearQueueAutoTimer() { clearAutoTimer('queue'); }
+function setStackPlaybackMode(mode) { setPlaybackMode('stack', mode); }
+function setQueuePlaybackMode(mode) { setPlaybackMode('queue', mode); }
+function markStackCompleteIfNeeded() { markCompleteIfNeeded('stack'); }
+function markQueueCompleteIfNeeded() { markCompleteIfNeeded('queue'); }
 
 // -- Stack rendering helper --
 function refreshStackDisplay(step) {
@@ -1514,42 +2010,8 @@ queueEngine.onNotify((engine) => {
 });
 
 // -- Stack operations --
-function startStackOperation(steps, readyMessage) {
-  if (stackAnimating || hasOperationInProgress(stackEngine)) return;
-  clearStackAutoTimer();
-  stackEngine.load(steps);
-
-  if (stackPlaybackMode === 'manual') {
-    document.getElementById('stack-step-tag').textContent = '待执行';
-    document.getElementById('stack-msg').textContent = readyMessage;
-    return;
-  }
-
-  stackAnimating = true;
-  refreshStackDisplay(null);
-  runStackAuto();
-}
-
-function runStackAuto() {
-  const step = stackEngine.next();
-  if (!step) {
-    stackAnimating = false;
-    refreshStackDisplay(stackEngine.currentStep());
-    markStackCompleteIfNeeded();
-    return;
-  }
-
-  if (stackEngine.hasNext()) {
-    stackAutoTimer = setTimeout(runStackAuto, AUTO_STEP_DELAY_MS);
-    return;
-  }
-
-  stackAutoTimer = setTimeout(() => {
-    stackAnimating = false;
-    stackAutoTimer = null;
-    refreshStackDisplay(stackEngine.currentStep());
-    markStackCompleteIfNeeded();
-  }, AUTO_STEP_DELAY_MS);
+function startStackOperation(steps, readyMessage, previewLines) {
+  startOperation('stack', steps, readyMessage, previewLines);
 }
 
 function stackPush() {
@@ -1562,7 +2024,7 @@ function stackPush() {
   if (steps.length <= 0) return;
 
   lastStackOp = `push(${val})`;
-  startStackOperation(steps, `${lastStackOp} 已载入，使用 ▶ 逐步执行。`);
+  startStackOperation(steps, `${lastStackOp} 已载入，使用 ▶ 逐步执行。`, [11]);
 }
 
 function stackPop() {
@@ -1570,7 +2032,7 @@ function stackPop() {
   const steps = generateStackPopSteps(stack);
   if (steps.length <= 0) return;
   lastStackOp = 'pop()';
-  startStackOperation(steps, `${lastStackOp} 已载入，使用 ▶ 逐步执行。`);
+  startStackOperation(steps, `${lastStackOp} 已载入，使用 ▶ 逐步执行。`, [20]);
 }
 
 function stackPeek() {
@@ -1578,7 +2040,7 @@ function stackPeek() {
   const steps = generateStackPeekSteps(stack);
   if (steps.length <= 0) return;
   lastStackOp = 'peek()';
-  startStackOperation(steps, `${lastStackOp} 已载入，使用 ▶ 逐步执行。`);
+  startStackOperation(steps, `${lastStackOp} 已载入，使用 ▶ 逐步执行。`, [29]);
 }
 
 function stackStepFwd() {
@@ -1607,42 +2069,8 @@ function stackReset() {
 }
 
 // -- Queue operations --
-function startQueueOperation(steps, readyMessage) {
-  if (queueAnimating || hasOperationInProgress(queueEngine)) return;
-  clearQueueAutoTimer();
-  queueEngine.load(steps);
-
-  if (queuePlaybackMode === 'manual') {
-    document.getElementById('queue-step-tag').textContent = '待执行';
-    document.getElementById('queue-msg').textContent = readyMessage;
-    return;
-  }
-
-  queueAnimating = true;
-  refreshQueueDisplay(null);
-  runQueueAuto();
-}
-
-function runQueueAuto() {
-  const step = queueEngine.next();
-  if (!step) {
-    queueAnimating = false;
-    refreshQueueDisplay(queueEngine.currentStep());
-    markQueueCompleteIfNeeded();
-    return;
-  }
-
-  if (queueEngine.hasNext()) {
-    queueAutoTimer = setTimeout(runQueueAuto, AUTO_STEP_DELAY_MS);
-    return;
-  }
-
-  queueAutoTimer = setTimeout(() => {
-    queueAnimating = false;
-    queueAutoTimer = null;
-    refreshQueueDisplay(queueEngine.currentStep());
-    markQueueCompleteIfNeeded();
-  }, AUTO_STEP_DELAY_MS);
+function startQueueOperation(steps, readyMessage, previewLines) {
+  startOperation('queue', steps, readyMessage, previewLines);
 }
 
 function queueEnqueue() {
@@ -1654,7 +2082,7 @@ function queueEnqueue() {
   const steps = generateQueueEnqSteps(queue, val);
   if (steps.length <= 0) return;
   lastQueueOp = `enqueue(${val})`;
-  startQueueOperation(steps, `${lastQueueOp} 已载入，使用 ▶ 逐步执行。`);
+  startQueueOperation(steps, `${lastQueueOp} 已载入，使用 ▶ 逐步执行。`, [12]);
 }
 
 function queueDequeue() {
@@ -1662,7 +2090,7 @@ function queueDequeue() {
   const steps = generateQueueDeqSteps(queue);
   if (steps.length <= 0) return;
   lastQueueOp = 'dequeue()';
-  startQueueOperation(steps, `${lastQueueOp} 已载入，使用 ▶ 逐步执行。`);
+  startQueueOperation(steps, `${lastQueueOp} 已载入，使用 ▶ 逐步执行。`, [20]);
 }
 
 function queuePeek() {
@@ -1670,7 +2098,7 @@ function queuePeek() {
   const steps = generateQueuePeekSteps(queue);
   if (steps.length <= 0) return;
   lastQueueOp = 'peek()';
-  startQueueOperation(steps, `${lastQueueOp} 已载入，使用 ▶ 逐步执行。`);
+  startQueueOperation(steps, `${lastQueueOp} 已载入，使用 ▶ 逐步执行。`, [29]);
 }
 
 function queueStepFwd() {
