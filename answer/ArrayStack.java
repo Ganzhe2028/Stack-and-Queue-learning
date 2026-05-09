@@ -39,7 +39,8 @@ public class ArrayStack {
     }
 
     public int pop() { // 「pop」意为“拿出来用”，所以要返回被pop的元素，并且代表着这个东西被“拿走了”
-                       // 但是在这个简易array的实现中，不会被设置为null，也不会被删除，其实依旧在那里甚至可以手动访问到它（which其实是违反了stack的意图的），
+                       // 但是在这个简易array的实现中，不会被设置为null，也不会被删除，其实依旧在那里，
+                       // 甚至可以手动访问到它（which其实是违反了stack的意图的），
                        // 但是我们通过top来控制访问的范围，所以就相当于被「pop」掉了。
                        // 然而这份代码中没有 private int top。
                        
@@ -86,3 +87,5 @@ public class ArrayStack {
         return top < 0;
     }
 }
+
+

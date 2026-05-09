@@ -41,7 +41,7 @@ open visualization/index-2.0.html
 
 - **根目录 stub 不可编译。** 学生的填空版本尚未完成，缺少方法体。不要尝试编译或运行根目录文件——它们只是骨架。
 - **answer/ 文件在 `package answer;` 下。** 任何 agent 在引用/拷贝 answer 代码时注意保留或调整 package 声明。visualization/ 下的副本是默认包（无 package 声明）。
-- **visualization/index.html** 是完全自包含的静态页面（内联 CSS + JS，无外部依赖），直接在浏览器打开即可。它内置了 ArrayStack 和 ArrayQueue 的 Java 源码副本作为代码显示；Stack/Queue 演示支持 Auto 1.5s 自动播放和 Step 手动逐步控制，当前布局不包含变量快照侧栏。
+- **visualization/index.html** 是完全自包含的静态页面（内联 CSS + JS，无外部依赖），直接在浏览器打开即可。它内置了 ArrayStack 和 ArrayQueue 的 Java 源码副本作为代码显示；Stack/Queue 演示默认使用 Step 手动模式，仍支持 Auto 1.5s 自动播放，左右方向键可前进/后退步骤，当前布局不包含变量快照侧栏。HTML demo 的 Stack/Queue 默认 capacity 都是 4；Queue 演示支持 Array 横排视图和 Circle 环形视图切换，环形视图中 front/rear 指针沿圆周外侧指向对应数组格；为强调数组实现，pop/dequeue 后被操作位置的元素保留在数组格中，并以 60% 饱和度显示。
 - **visualization/index-2.0.html** 是 2.0 预览版，不替代原页面。它保留同一套 Stack/Queue 演示能力，采用高度自适应浏览器窗口的“教学工作台”布局；待执行状态先高亮方法入口行，并重构了播放 runtime 以减少 Stack/Queue 重复逻辑。
 
 ## Git 历史

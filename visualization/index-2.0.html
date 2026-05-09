@@ -147,6 +147,7 @@
     letter-spacing: 0.7px;
     margin-bottom: 20px;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 12px;
   }
@@ -154,6 +155,30 @@
     width: 10px; height: 10px;
     border-radius: 50%;
     display: inline-block;
+  }
+  .queue-view-toggle {
+    margin-left: auto;
+    display: inline-flex;
+    gap: 6px;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.58);
+  }
+  .view-toggle-btn {
+    border: none;
+    border-radius: 7px;
+    padding: 6px 10px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .view-toggle-btn.active {
+    background: var(--mint-soft);
+    color: var(--mint);
   }
 
   /* ===== ARRAY CELLS ===== */
@@ -227,7 +252,7 @@
     border-color: var(--rose);
     background: var(--rose-soft);
     transform: scale(0.92);
-    opacity: 0.6;
+    filter: saturate(60%);
     box-shadow: 0 4px 12px rgba(201,88,82,0.14);
   }
   .cell.enqueueing {
@@ -241,11 +266,73 @@
     border-color: var(--rose);
     background: var(--rose-soft);
     transform: scale(0.92);
-    opacity: 0.6;
+    filter: saturate(60%);
   }
   .cell.removed {
     transform: scale(0.7);
     opacity: 0;
+  }
+  .cell.dimmed {
+    border-color: var(--rose);
+    background: var(--rose-soft);
+    filter: saturate(60%);
+    box-shadow: 0 4px 12px rgba(201,88,82,0.1);
+  }
+  .cell.dimmed .value { color: var(--rose); }
+  .array-container.circular {
+    min-height: 340px;
+    padding: 28px 0 44px;
+    align-items: center;
+    overflow: visible;
+  }
+  .cells-ring {
+    position: relative;
+    width: min(320px, 72vw);
+    aspect-ratio: 1;
+    margin: 0 auto;
+    border: 2px dashed rgba(35,132,111,0.28);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, rgba(35,132,111,0.08) 0 34%, transparent 35%),
+      radial-gradient(circle, transparent 0 64%, rgba(35,132,111,0.04) 65% 100%);
+  }
+  .cells-ring::after {
+    content: "↻";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(35,132,111,0.42);
+    font-size: 54px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .array-container.circular .cell {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 86px;
+    height: 76px;
+    border-radius: 18px;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+  .array-container.circular .cell .index {
+    left: 50%;
+    right: auto;
+    bottom: -24px;
+    transform: translateX(-50%);
+  }
+  .array-container.circular .cell.active {
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+  .array-container.circular .cell.pushing,
+  .array-container.circular .cell.enqueueing {
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+  .array-container.circular .cell.popping,
+  .array-container.circular .cell.dequeueing {
+    transform: translate(-50%, -50%) scale(0.92);
   }
 
   /* ===== POINTER OVERLAY ===== */
@@ -320,6 +407,23 @@
   }
   .ptr-group.right .ptr-arrow {
     font-size: 26px;
+  }
+  .ptr-group.circular {
+    transform: translate(-50%, -50%);
+    animation: none;
+    opacity: 1;
+    gap: 3px;
+    z-index: 5;
+  }
+  .ptr-group.circular .ptr-label {
+    border-radius: 14px;
+    box-shadow: 0 8px 18px rgba(31,44,67,0.13);
+  }
+  .ptr-group.circular .ptr-arrow {
+    font-size: 24px;
+    transform: rotate(var(--arrow-rotation));
+    line-height: 1;
+    text-shadow: 0 2px 6px rgba(31,44,67,0.12);
   }
 
   /* ===== CAPACITY LABEL ===== */
@@ -945,6 +1049,30 @@
       right: -26px;
     }
 
+    .array-container.circular {
+      flex: 1 0 230px;
+      min-height: 230px;
+      padding: 4px 0 10px;
+    }
+
+    .array-container.circular .cells-ring {
+      width: 218px;
+    }
+
+    .array-container.circular .cell {
+      width: 64px;
+      height: 52px;
+    }
+
+    .array-container.circular .cell .value {
+      font-size: 20px;
+    }
+
+    .array-container.circular .ptr-label {
+      font-size: 11px;
+      padding: 3px 9px;
+    }
+
     .pointer-badge {
       padding: 4px 10px;
       font-size: 12px;
@@ -1045,8 +1173,8 @@
           <button class="btn btn-outline" id="stack-reset-btn" title="重置栈到初始状态">↺ Reset</button>
         </div>
         <div class="btn-group" role="group" aria-label="Stack playback mode">
-          <button class="btn btn-outline active" id="stack-auto-mode-btn" title="自动播放，每步停留 1.5 秒">Auto 1.5s</button>
-          <button class="btn btn-outline" id="stack-manual-mode-btn" title="手动逐步执行">Step</button>
+          <button class="btn btn-outline" id="stack-auto-mode-btn" title="自动播放，每步停留 1.5 秒">Auto 1.5s</button>
+          <button class="btn btn-outline active" id="stack-manual-mode-btn" title="手动逐步执行">Step</button>
         </div>
         <div class="btn-group">
           <button class="btn btn-outline" id="stack-step-back-btn" disabled title="上一步">◀</button>
@@ -1077,12 +1205,16 @@
           — <strong style="color:var(--cobalt)">front</strong> 指向队首，
           <strong style="color:var(--orange)">rear</strong> 指向下一个空位
         </span>
+        <div class="queue-view-toggle" role="group" aria-label="Queue view mode">
+          <button class="view-toggle-btn active" id="queue-linear-view-btn" title="数组横排视图">Array</button>
+          <button class="view-toggle-btn" id="queue-circular-view-btn" title="环形队列视图">Circle</button>
+        </div>
       </div>
 
       <div class="array-container" id="queue-array"></div>
 
       <div class="capacity-label">
-        capacity = <span id="queue-cap">6</span>
+        capacity = <span id="queue-cap">4</span>
         &nbsp;·&nbsp; size = <span id="queue-size">0</span>
       </div>
 
@@ -1100,8 +1232,8 @@
           <button class="btn btn-outline" id="queue-reset-btn" title="重置队列到初始状态">↺ Reset</button>
         </div>
         <div class="btn-group" role="group" aria-label="Queue playback mode">
-          <button class="btn btn-outline active" id="queue-auto-mode-btn" title="自动播放，每步停留 1.5 秒">Auto 1.5s</button>
-          <button class="btn btn-outline" id="queue-manual-mode-btn" title="手动逐步执行">Step</button>
+          <button class="btn btn-outline" id="queue-auto-mode-btn" title="自动播放，每步停留 1.5 秒">Auto 1.5s</button>
+          <button class="btn btn-outline active" id="queue-manual-mode-btn" title="手动逐步执行">Step</button>
         </div>
         <div class="btn-group">
           <button class="btn btn-outline" id="queue-step-back-btn" disabled title="上一步">◀</button>
@@ -1132,7 +1264,7 @@
 // ============================================================
 const STACK_CODE = [
   'public class ArrayStack {',
-  '    static final int CAPACITY = 8;',
+  '    static final int CAPACITY = 4;',
   '    int top;',
   '    int stack[];',
   '',
@@ -1291,11 +1423,12 @@ class StepEngine {
 // ============================================================
 //  Stack Logic
 // ============================================================
-const STACK_CAPACITY = 8;
+const STACK_CAPACITY = 4;
 
 function createStack() {
   return {
     array: new Array(STACK_CAPACITY).fill(null),
+    removed: new Set(),
     top: -1,
     capacity: STACK_CAPACITY,
   };
@@ -1323,19 +1456,26 @@ function generateStackPushSteps(stack, val) {
     return steps;
   }
 
+  const targetIndex = stack.top + 1;
+  const previousVal = stack.array[targetIndex];
+  const wasRemoved = stack.removed.has(targetIndex);
+
   steps.push({
     lines: [16],
-    desc: `执行 stack[++top] = ${val} → top 自增为 ${stack.top + 1}，将 ${val} 存入 array[${stack.top + 1}]`,
+    desc: `执行 stack[++top] = ${val} → top 自增为 ${targetIndex}，将 ${val} 存入 array[${targetIndex}]`,
     tag: '写入',
     action: () => {
       stack.top++;
       stack.array[stack.top] = val;
+      stack.removed.delete(stack.top);
     },
     revert: () => {
-      stack.array[stack.top] = null;
+      stack.array[targetIndex] = previousVal;
+      if (wasRemoved) stack.removed.add(targetIndex);
+      else stack.removed.delete(targetIndex);
       stack.top--;
     },
-    animCell: stack.top + 1,
+    animCell: targetIndex,
     animType: 'pushing',
   });
 
@@ -1372,21 +1512,25 @@ function generateStackPopSteps(stack) {
     return steps;
   }
 
-  const poppedVal = stack.array[stack.top];
+  const popIndex = stack.top;
+  const poppedVal = stack.array[popIndex];
+  const wasRemoved = stack.removed.has(popIndex);
 
   steps.push({
     lines: [25],
-    desc: `执行 int element = stack[top--] → element = ${poppedVal}，top 从 ${stack.top} 减为 ${stack.top - 1}`,
+    desc: `执行 int element = stack[top--] → element = ${poppedVal}，top 从 ${popIndex} 减为 ${popIndex - 1}`,
     tag: '读取',
     action: () => {
-      stack.array[stack.top] = null;
+      stack.removed.add(popIndex);
       stack.top--;
     },
     revert: () => {
       stack.top++;
-      stack.array[stack.top] = poppedVal;
+      stack.array[popIndex] = poppedVal;
+      if (wasRemoved) stack.removed.add(popIndex);
+      else stack.removed.delete(popIndex);
     },
-    animCell: stack.top,
+    animCell: popIndex,
     animType: 'popping',
     popVal: poppedVal,
   });
@@ -1453,11 +1597,12 @@ function generateStackPeekSteps(stack) {
 // ============================================================
 //  Queue Logic
 // ============================================================
-const QUEUE_CAPACITY = 6;
+const QUEUE_CAPACITY = 4;
 
 function createQueue() {
   return {
     array: new Array(QUEUE_CAPACITY).fill(null),
+    removed: new Set(),
     front: 0,
     rear: 0,
     size: 0,
@@ -1487,17 +1632,24 @@ function generateQueueEnqSteps(queue, val) {
     return steps;
   }
 
+  const enqueueIndex = queue.rear;
+  const previousVal = queue.array[enqueueIndex];
+  const wasRemoved = queue.removed.has(enqueueIndex);
+
   steps.push({
     lines: [14],
-    desc: `执行 array[rear] = item：array[${queue.rear}] = ${val}`,
+    desc: `执行 array[rear] = item：array[${enqueueIndex}] = ${val}`,
     tag: '写入',
     action: () => {
-      queue.array[queue.rear] = val;
+      queue.array[enqueueIndex] = val;
+      queue.removed.delete(enqueueIndex);
     },
     revert: () => {
-      queue.array[queue.rear] = null;
+      queue.array[enqueueIndex] = previousVal;
+      if (wasRemoved) queue.removed.add(enqueueIndex);
+      else queue.removed.delete(enqueueIndex);
     },
-    animCell: queue.rear,
+    animCell: enqueueIndex,
     animType: 'enqueueing',
   });
 
@@ -1559,6 +1711,7 @@ function generateQueueDeqSteps(queue) {
   const deqVal = queue.array[queue.front];
   const oldFront = queue.front;
   const newFront = (queue.front + 1) % queue.capacity;
+  const wasRemoved = queue.removed.has(oldFront);
 
   steps.push({
     lines: [23],
@@ -1576,12 +1729,14 @@ function generateQueueDeqSteps(queue) {
     desc: `执行 front = (front + 1) % capacity：(${oldFront} + 1) % ${queue.capacity} = ${newFront}`,
     tag: '移动',
     action: () => {
-      queue.array[oldFront] = null;
+      queue.removed.add(oldFront);
       queue.front = newFront;
     },
     revert: () => {
       queue.front = oldFront;
       queue.array[oldFront] = deqVal;
+      if (wasRemoved) queue.removed.add(oldFront);
+      else queue.removed.delete(oldFront);
     },
   });
 
@@ -1672,8 +1827,55 @@ function renderArray(containerId, arrayData, highlights = {}, pointerDefs = [], 
   const container = document.getElementById(containerId);
   const cellAnim = highlights.cell !== undefined ? highlights.type || 'active' : '';
   const animClass = cellAnim ? ` ${cellAnim}` : '';
+  const dimmedCells = highlights.dimmedCells || options.dimmedCells || new Set();
   const cellVal = (v) => v !== null && v !== undefined ? v : '';
   const isVertical = options.vertical;
+  const isCircular = options.circular;
+
+  container.classList.toggle('circular', Boolean(isCircular));
+
+  if (isCircular) {
+    const cellRadius = 34;
+    const pointerRadius = 54;
+    let html = '<div class="cells-ring">';
+    html += arrayData.map((val, i) => {
+      const angle = -Math.PI / 2 + (Math.PI * 2 * i) / arrayData.length;
+      const x = 50 + Math.cos(angle) * cellRadius;
+      const y = 50 + Math.sin(angle) * cellRadius;
+      const isActive = highlights.cell === i ? animClass : '';
+      const isDimmed = dimmedCells.has ? dimmedCells.has(i) : dimmedCells.includes(i);
+      const isEmpty = val === null || val === undefined;
+      return `<div class="cell${isEmpty ? ' empty' : ''}${isDimmed ? ' dimmed' : ''}${isActive}" data-index="${i}" style="--x:${x}%;--y:${y}%">
+        <span class="value">${isEmpty ? '&nbsp;' : cellVal(val)}</span>
+        <span class="index">${i}</span>
+      </div>`;
+    }).join('');
+
+    const pointerCounts = pointerDefs.reduce((acc, p) => {
+      acc[p.cellIndex] = (acc[p.cellIndex] || 0) + 1;
+      return acc;
+    }, {});
+    const usedLayers = {};
+    html += pointerDefs.map((p) => {
+      if (p.cellIndex < 0 || p.cellIndex >= arrayData.length) return '';
+      const layer = usedLayers[p.cellIndex] || 0;
+      usedLayers[p.cellIndex] = layer + 1;
+      const angle = -Math.PI / 2 + (Math.PI * 2 * p.cellIndex) / arrayData.length;
+      const hasSharedCell = pointerCounts[p.cellIndex] > 1;
+      const radius = pointerRadius + (hasSharedCell ? 0 : layer * 10);
+      const tangentOffset = hasSharedCell ? (layer === 0 ? -10 : 10) : 0;
+      const x = 50 + Math.cos(angle) * radius + (-Math.sin(angle) * tangentOffset);
+      const y = 50 + Math.sin(angle) * radius + (Math.cos(angle) * tangentOffset);
+      const rotation = angle * 180 / Math.PI + 90;
+      return `<div class="ptr-group circular ${p.color || 'cobalt'}" style="left:${x}%;top:${y}%;--arrow-rotation:${rotation}deg">
+        <div class="ptr-label">${p.label}: ${p.value}</div>
+        <div class="ptr-arrow">▼</div>
+      </div>`;
+    }).join('');
+    html += '</div>';
+    container.innerHTML = html;
+    return;
+  }
 
   const gap = 10;
 
@@ -1684,8 +1886,9 @@ function renderArray(containerId, arrayData, highlights = {}, pointerDefs = [], 
   let html = '<div class="cells-row" style="' + flexStyle + '">';
   html += arrayData.map((val, i) => {
     const isActive = highlights.cell === i ? animClass : '';
+    const isDimmed = dimmedCells.has ? dimmedCells.has(i) : dimmedCells.includes(i);
     const isEmpty = val === null || val === undefined;
-    return `<div class="cell${isEmpty ? ' empty' : ''}${isActive}" data-index="${i}">
+    return `<div class="cell${isEmpty ? ' empty' : ''}${isDimmed ? ' dimmed' : ''}${isActive}" data-index="${i}">
       <span class="value">${isEmpty ? '&nbsp;' : cellVal(val)}</span>
       <span class="index">${i}</span>
     </div>`;
@@ -1796,8 +1999,9 @@ const stackEngine = new StepEngine();
 const queueEngine = new StepEngine();
 let stackAnimating = false;
 let queueAnimating = false;
-let stackPlaybackMode = 'auto';
-let queuePlaybackMode = 'auto';
+let stackPlaybackMode = 'manual';
+let queuePlaybackMode = 'manual';
+let queueViewMode = 'linear';
 let stackAutoTimer = null;
 let queueAutoTimer = null;
 
@@ -1811,6 +2015,14 @@ function updateModeButtons(prefix, mode) {
   if (!autoBtn || !manualBtn) return;
   autoBtn.classList.toggle('active', mode === 'auto');
   manualBtn.classList.toggle('active', mode === 'manual');
+}
+
+function updateQueueViewButtons() {
+  const linearBtn = document.getElementById('queue-linear-view-btn');
+  const circularBtn = document.getElementById('queue-circular-view-btn');
+  if (!linearBtn || !circularBtn) return;
+  linearBtn.classList.toggle('active', queueViewMode === 'linear');
+  circularBtn.classList.toggle('active', queueViewMode === 'circular');
 }
 
 const demoRuntime = {
@@ -1915,6 +2127,11 @@ function clearStackAutoTimer() { clearAutoTimer('stack'); }
 function clearQueueAutoTimer() { clearAutoTimer('queue'); }
 function setStackPlaybackMode(mode) { setPlaybackMode('stack', mode); }
 function setQueuePlaybackMode(mode) { setPlaybackMode('queue', mode); }
+function setQueueViewMode(mode) {
+  queueViewMode = mode;
+  updateQueueViewButtons();
+  refreshQueueDisplay(queueEngine.currentStep());
+}
 function markStackCompleteIfNeeded() { markCompleteIfNeeded('stack'); }
 function markQueueCompleteIfNeeded() { markCompleteIfNeeded('queue'); }
 
@@ -1925,6 +2142,7 @@ function refreshStackDisplay(step) {
     highlights.cell = step.animCell;
     highlights.type = step.animType || 'active';
   }
+  highlights.dimmedCells = stack.removed;
   renderArray('stack-array', stack.array, highlights, [
     { cellIndex: stack.top >= 0 ? stack.top : 0, label: 'top', value: stack.top, color: 'cobalt' },
   ], { vertical: true });
@@ -1966,11 +2184,13 @@ function refreshQueueDisplay(step) {
     highlights.cell = step.animCell;
     highlights.type = step.animType || 'active';
   }
+  highlights.dimmedCells = queue.removed;
   renderArray('queue-array', queue.array, highlights, [
     { cellIndex: queue.front, label: 'front', value: queue.front, color: 'cobalt' },
     { cellIndex: queue.rear, label: 'rear', value: queue.rear, color: 'orange', side: 'bottom' },
-  ]);
+  ], { circular: queueViewMode === 'circular' });
   updateQueueMeta(queue);
+  updateQueueViewButtons();
 
   const tag = document.getElementById('queue-step-tag');
   const msg = document.getElementById('queue-msg');
@@ -2143,8 +2363,9 @@ function init() {
   renderArray('queue-array', queue.array, {}, [
     { cellIndex: 0, label: 'front', value: queue.front, color: 'cobalt' },
     { cellIndex: 0, label: 'rear', value: queue.rear, color: 'orange', side: 'bottom' },
-  ]);
+  ], { circular: queueViewMode === 'circular' });
   updateQueueMeta(queue);
+  updateQueueViewButtons();
 
   // Tab switching
   document.querySelectorAll('.tab').forEach(tab => {
@@ -2182,6 +2403,8 @@ function init() {
   document.getElementById('queue-step-back-btn').addEventListener('click', queueStepBack);
   document.getElementById('queue-auto-mode-btn').addEventListener('click', () => setQueuePlaybackMode('auto'));
   document.getElementById('queue-manual-mode-btn').addEventListener('click', () => setQueuePlaybackMode('manual'));
+  document.getElementById('queue-linear-view-btn').addEventListener('click', () => setQueueViewMode('linear'));
+  document.getElementById('queue-circular-view-btn').addEventListener('click', () => setQueueViewMode('circular'));
   document.getElementById('queue-input').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') queueEnqueue();
   });
@@ -2190,11 +2413,22 @@ function init() {
   document.addEventListener('keydown', (e) => {
     const activeTab = document.querySelector('.tab.active');
     const tab = activeTab ? activeTab.dataset.tab : 'stack';
-    if (e.target.tagName === 'INPUT') return;
+    const typingTarget = e.target.matches('input, textarea, select') || e.target.isContentEditable;
+    if (typingTarget) return;
 
     switch(e.key) {
       case '1': document.querySelector('[data-tab="stack"]').click(); break;
       case '2': document.querySelector('[data-tab="queue"]').click(); break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (tab === 'stack') stackStepBack();
+        else queueStepBack();
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        if (tab === 'stack') stackStepFwd();
+        else queueStepFwd();
+        break;
     }
   });
 }

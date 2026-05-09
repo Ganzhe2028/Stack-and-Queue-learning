@@ -21,7 +21,8 @@ public class ArrayQueue {
         rear = (rear + 1) % capacity; // 更新为下一次enqueu的位置。如果r<capacity，则意味着运算得到的余数就是r自己的当前值
                                       // 如果是 r=capacity，也就是说r到了末尾了，那么 % 的操作会让它回到0，也就是开头的位置。
                                       // 也就是说 % 的作用就是在累积到末尾的时候，类似于「清楚了累积的index」以回到开头
-                                      // x = (x+1) % capacity 的操作是通用的（用于在array中达到循环的效果），因此 rear 和 front 都可以用这个操作来更新位置。
+                                      // x = (x+1) % capacity 的操作是通用的（用于在array中达到循环的效果），
+                                      // 因此 rear 和 front 都可以用这个操作来更新位置。
         size++;
 
         System.out.println(item + " is enqueued.");
@@ -38,6 +39,7 @@ public class ArrayQueue {
         size--;
 
         return item; // 返回被dequeue的值
+        // 实际上并没有删除任何数值和覆盖数值，因为我们通过front和rear来控制访问的位置，所以即使array中原来的数值还在，我们也已经不访问它了。
     }
 
     public int peek() {
@@ -54,3 +56,4 @@ public class ArrayQueue {
     }
 
 }
+
