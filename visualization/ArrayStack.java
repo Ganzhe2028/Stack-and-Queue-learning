@@ -1,9 +1,16 @@
-package answer;
 public class ArrayStack {
 
     static final int CAPACITY = 1000;
     int top;
     int stack[];
+
+    public static void main(String[] args) {
+        ArrayStack s = new ArrayStack();
+        s.push(10);
+        s.push(20);
+        s.push(30);
+        System.out.println(s.pop() + " Popped from stack");
+    }
 
     public ArrayStack() {
         top = -1;

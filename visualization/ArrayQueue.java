@@ -1,9 +1,19 @@
-package answer;
 public class ArrayQueue {
 
     int front, rear, size;
     int capacity;
     int array[];
+
+    public static void main(String[] args) {
+        ArrayQueue queue = new ArrayQueue(3);
+        queue.enqueue(1);
+        queue.enqueue(2);
+        queue.enqueue(3);
+        System.out.println(queue.dequeue());
+        System.out.println(queue.dequeue());
+        System.out.println(queue.dequeue());
+        queue.enqueue(4);
+    }
 
     public ArrayQueue(int capacity) {
         this.capacity = capacity;
